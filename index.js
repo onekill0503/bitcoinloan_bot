@@ -31,7 +31,16 @@ const getHigh = (list) => {
     return l;
 }
 
+
+bot.use(async (ctx, next) => {
+    const start = new Date()
+    await next()
+    const ms = new Date() - start
+    console.log(`Response message time from ${ctx.from.username}: ${ms}ms`)
+});
+
 bot.command("howtogetbitcoinloan" , async ctx => {
+    await tele.deleteMessage(ctx.message.chat.id , ctx.message.message_id);
     let message = "How to get a bitcoin loan:\n\n";
     message += "1. KYC form registration https://forms.gle/2N461pXo5e1Yv9La9\n\n";
     message += "2. Confirmation of KYC (pass / fail)\n\n";
@@ -42,6 +51,7 @@ bot.command("howtogetbitcoinloan" , async ctx => {
 })
 
 bot.command("howtogetbitcoinloan_my", async ctx => {
+    await tele.deleteMessage(ctx.message.chat.id , ctx.message.message_id);
     let message = "Cara mendapatkan pinjaman bitcoin: \n\n";
     message += "1. Pendaftaran borang KYC, https://forms.gle/2N461pXo5e1Yv9La9\n\n";
     message += "2. Pengesahan KYC (lulus / gagal)\n\n";
@@ -77,12 +87,12 @@ bot.command('btcprice' , async ctx => {
             const d = new Date();
             d.setDate(d.getDate() - 6);
             dateFormat = d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear();
-            console.log(dateFormat)
+
             const day7H = await axios.get(`https://api.coingecko.com/api/v3/coins/${coinId.id}/history?date=${dateFormat}`);
             const day7 = day7H.data.market_data.current_price.usd.toFixed(2);
             d.setDate(d.getDate() - 7);
             dateFormat = d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear();
-            console.log(dateFormat)
+
             const day14H = await axios.get(`https://api.coingecko.com/api/v3/coins/${coinId.id}/history?date=${dateFormat}`);
             const day14 = day14H.data.market_data.current_price.usd.toFixed(2);
 
@@ -101,12 +111,14 @@ bot.command('btcprice' , async ctx => {
             message += `14D\t : ${day14P} % ${day14P >= 0 ? happy : sad}\n`;
             message += `Vol : $${convertCurrency(volum)}</pre>`;
 
+            await tele.deleteMessage(ctx.message.chat.id , ctx.message.message_id);
             ctx.reply(message , {parse_mode: 'HTML'});
         }
     }
 })
 
 bot.command('calc' , async ctx => {
+    await tele.deleteMessage(ctx.message.chat.id , ctx.message.message_id);
     const amount = ctx.message.text.split(' ')[1];
     if(!isNaN(parseFloat(amount))){
         const amount_int = parseFloat(amount);
@@ -128,19 +140,8 @@ bot.command('calc' , async ctx => {
     }
 })
 
-bot.use(async (ctx, next) => {
-    const start = new Date()
-    await tele.deleteMessage(ctx.message.chat.id , ctx.message.message_id);
-    await next()
-    const ms = new Date() - start
-    console.log(`Response message time from ${ctx.from.username}: ${ms}ms`)
-});
-
-bot.on('text' , ctx => {
-
-})
-
 bot.on('new_chat_members' , async ctx => {
+    await tele.deleteMessage(ctx.message.chat.id , ctx.message.message_id);
     await ctx.reply(`Hello ${ctx.from.first_name} !\nWelcome to Bitcoin loan community.`)
 })
 
